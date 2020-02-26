@@ -2,6 +2,8 @@ import logging
 import socket
 from .router import Router
 from .request import Request
+from .exceptions import HttpServerException
+from .response import TextResponse
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +26,12 @@ class Server:
         Обработать сырой http запрос (Обработка полученных от клиента байтиков)
         """
         req = Request.from_http_bytes(addr, data)
-        response = self.router.process_request(req)  # bytes -> Response
+        try:
+            response = self.router.process_request(req)  # bytes -> Response
+        except HttpServerException as e:
+            response = TextResponse()
+            response.setStatus(e.status)
+            response.setBody(e.msg)
         if response:
             conn.sendall(response if type(response) == bytes else response.encode())
         # Закрываем соединение

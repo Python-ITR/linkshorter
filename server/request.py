@@ -54,7 +54,7 @@ class Request:
         self.ip = ip
         self.port = port
         self.method = method
-        self.path = path
+        self.path = path # type: str
         self.headers = headers
         self.body = body
 

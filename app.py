@@ -1,22 +1,24 @@
+import mimetypes
+import os
 import logging
-from server import Server, Route, Router, Request, TextResponse, Response
+from server import Server, Route, Router, Request, HtmlResponse, Response, serve
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-def index_view(req: Request) -> bytes:
-    return b"HTTP/1.1 200 OK\r\n\r\nHello!"
+logger = logging.getLogger(__name__)
 
 
 def index_view_v2(req: Request) -> Response:
-    res = TextResponse()
-    res.setBody("ЛHello world!")
+    res = HtmlResponse()
+    with open("./static/index.html", "rb") as f:
+        res.setBody(f.read())
     return res
 
 
 def main():
     router = Router()
     router.add_route(Route(r"^/$", index_view_v2))
+    router.add_route(Route(r"^/static", serve("./static", "/static")))
     server = Server(router=router, addr=("localhost", 9999))
     server.start_loop()
 
