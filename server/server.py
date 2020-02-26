@@ -24,9 +24,9 @@ class Server:
         Обработать сырой http запрос (Обработка полученных от клиента байтиков)
         """
         req = Request.from_http_bytes(addr, data)
-        response = self.router.process_request(req)
+        response = self.router.process_request(req)  # bytes -> Response
         if response:
-            conn.sendall(response)
+            conn.sendall(response if type(response) == bytes else response.encode())
         # Закрываем соединение
         logger.info(f"Close connection: {addr}")
         conn.close()
