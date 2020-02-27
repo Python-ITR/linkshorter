@@ -55,8 +55,9 @@ class Response:
         return (
             # стартовая строка
             f"HTTP/1.1 {self._status} {self._status.phrase}\n"
+            +
             # конкатенируем заголовки через перенос строки
-            "\n".join([f"{key}: {value}\n" for key, value in self._headers.items()])
+            ("\n".join([f"{key}: {value}" for key, value in self._headers.items()]))
         )
 
     def encode(self) -> bytes:
@@ -64,6 +65,7 @@ class Response:
         Представить текущий ответ в bytes
         """
         self._updateContentLength()
+        print("!", self._getHeaders())
         http_response_bytes = bytearray(self._getHeaders(), "utf-8")  # type: bytearray
         if self._body:
             http_response_bytes.extend(b"\r\n\r\n")

@@ -32,5 +32,5 @@ class Router:
                 if match:
                     return route.handler(req)
         except Exception:
-            raise HttpInternalErrorException()
+            raise HttpInternalErrorException(path=req.path)
         raise HttpNotFoundException("Not found matched route", path=req.path)
