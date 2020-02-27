@@ -1,7 +1,6 @@
-import mimetypes
-import os
 import logging
-from server import Server, Route, Router, Request, HtmlResponse, Response, serve
+
+from server import HtmlResponse, Request, Response, Route, Router, Server, serve
 
 logging.basicConfig(level=logging.DEBUG)
 

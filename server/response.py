@@ -1,27 +1,38 @@
+from http import HTTPStatus
 from typing import Union
 
 
 class Response:
-    def __init__(self, status=200, headers={}, body=b""):
+    def __init__(self, status: HTTPStatus = HTTPStatus.OK, headers={}, body=b""):
         self._status = status
         self._body = body  # type: Union[bytes, str]
         self._headers = headers
 
-    def setStatus(self, status: int):
-        """ Установить статус """
-        self._status = status
+    @property
+    def status(self):
+        return self._status
 
-    def addHeader(self, key, value):
+    @status.setter
+    def status(self, value: HTTPStatus):
+        self._status = value
+
+    @property
+    def body(self):
+        return self._body
+
+    @body.setter
+    def body(self, value: Union[bytes, str]):
+        self._body = value
+        self._updateContentLength()
+
+    def addHeader(self, key: str, value: str):
         """ Добавить новый заголовок """
         self._headers[key] = value
 
-    def delHeader(self, key):
+    def delHeader(self, key: str):
         """ Удалить заголовок из объекта ответа """
-        del self._headers[key]
+        self._headers.pop(key, 0)
 
-    def setBody(self, body):
-        """ Установить тело ответа (может быть строкой или bytes) """
-        self._body = body
         self._updateContentLength()
 
     def _updateContentLength(self):
@@ -30,7 +41,9 @@ class Response:
         """
         self.addHeader(
             "Content-Length",
-            len(self._body.encode() if type(self._body) == str else self._body),
+            str(
+                len(self._body.encode() if isinstance(self._body, str) else self._body)
+            ),
         )
 
     def _getHeaders(self) -> str:
@@ -39,19 +52,21 @@ class Response:
         - стартовая строка HTTP ответа
         - заголовки
         """
-        http_headers_string = f"HTTP/1.1 {self._status} OK\n"
-        for key, value in self._headers.items():
-            http_headers_string += f"{key}: {value}\n"
-        return http_headers_string
+        return (
+            # стартовая строка
+            f"HTTP/1.1 {self._status} {self._status.phrase}\n"
+            # конкатенируем заголовки через перенос строки
+            "\n".join([f"{key}: {value}\n" for key, value in self._headers.items()])
+        )
 
     def encode(self) -> bytes:
         """
-        Переводит объект ответа в bytes для передачи по сети
+        Представить текущий ответ в bytes
         """
         self._updateContentLength()
-        http_response_bytes = self._getHeaders().encode()
+        http_response_bytes = bytearray(self._getHeaders(), "utf-8")  # type: bytearray
         if self._body:
-            http_response_bytes += b"\r\n"
+            http_response_bytes.extend(b"\r\n\r\n")
             http_response_bytes += (
                 #      👇 - в случае когда self.body – строка
                 self._body.encode()
@@ -59,7 +74,7 @@ class Response:
                 #      👇 - self.body – bytes
                 else self._body
             )
-        return http_response_bytes
+        return bytes(http_response_bytes)
 
 
 class TextResponse(Response):

@@ -1,4 +1,5 @@
 import re
+from typing import Dict
 
 
 class Request:
@@ -29,7 +30,7 @@ class Request:
             raise Exception("Invalid start line in HTTP request")
         # Парсим заголовки
         body_start_line = None
-        headers = []  # [(key: value)]
+        headers = {}  # [(key: value)]
         for line in lines[1:]:
             if not line:
                 body_start_line = lines.index(line)
@@ -37,12 +38,9 @@ class Request:
             header_line = line.decode("utf-8")
             header_line_match = Request.HTTP_HEADER_RE.match(header_line)
             if header_line_match:
-                headers.append(
-                    (
-                        header_line_match.group("key").strip(),
-                        header_line_match.group("value").strip(),
-                    )
-                )
+                headers[
+                    header_line_match.group("key").strip()
+                ] = header_line_match.group("value").strip()
         # Сохраняем body в отдельную переменную
         body = None
         if body_start_line:
@@ -51,14 +49,12 @@ class Request:
         return cls(addr[0], addr[1], method, path, headers, body)
 
     def __init__(self, ip, port, method, path, headers, body):
-        self.ip = ip
-        self.port = port
-        self.method = method
-        self.path = path # type: str
-        self.headers = headers
-        self.body = body
+        self.ip = ip  # type: str
+        self.port = port  # type: int
+        self.method = method  # type: str
+        self.path = path  # type: str
+        self.headers = headers  # type: Dict[str, str]
+        self.body = body  # type: bytes
 
     def __str__(self):
         return f"<Request ip={self.ip} port={self.port} path={self.path} method={self.method} headers={self.headers}>"
-
-

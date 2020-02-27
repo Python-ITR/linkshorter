@@ -1,9 +1,11 @@
 import logging
 import socket
-from .router import Router
-from .request import Request
+from datetime import datetime
+
 from .exceptions import HttpServerException
+from .request import Request
 from .response import TextResponse
+from .router import Router
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +28,19 @@ class Server:
         Обработать сырой http запрос (Обработка полученных от клиента байтиков)
         """
         req = Request.from_http_bytes(addr, data)
+        start_time = datetime.now()
+        response = None
         try:
             response = self.router.process_request(req)  # bytes -> Response
         except HttpServerException as e:
             response = TextResponse()
-            response.setStatus(e.status)
-            response.setBody(e.msg)
+            response.status = e.status
+            response.body = e.msg
         if response:
-            conn.sendall(response if type(response) == bytes else response.encode())
+            conn.sendall(response if isinstance(response, bytes) else response.encode())
+            logger.debug(
+                f"[{response.status}][{datetime.now() - start_time}] {req.path}"
+            )
         # Закрываем соединение
         logger.info(f"Close connection: {addr}")
         conn.close()
@@ -47,7 +54,7 @@ class Server:
             logger.info(f"Listen on: {self.addr}")
             while True:
                 conn, addr = sock.accept()
-                logging.info(f"New connection: {addr}")
+                logger.debug(f"New connection: {addr}")
                 data = bytearray()  # Все данные от клиента
                 while True:
                     r_data = conn.recv(1024)
