@@ -10,12 +10,14 @@
     />
   </head>
   <body>
+    {% if created_link %}
     <div class="container">
       <div class="jumbotron mt-3">
         <h3>Поздравляем! Новая ссылка готова:</h3>
-        <a>http://localhost:9999/code</a>
+        <a>http://localhost:9999/{{created_link.code}}</a>
       </div>
     </div>
+    {% endif %}
     <div class="container">
       <form class="form-inline" action="/create_link" method="POST">
         <div class="form-group">

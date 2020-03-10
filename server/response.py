@@ -33,18 +33,20 @@ class Response:
         """ Удалить заголовок из объекта ответа """
         self._headers.pop(key, 0)
 
-        self._updateContentLength()
-
     def _updateContentLength(self):
         """
         Метод будет добавлять заголовок 'Content-Length' определяя длину self._body
         """
-        self.addHeader(
-            "Content-Length",
-            str(
-                len(self._body.encode() if isinstance(self._body, str) else self._body)
-            ),
-        )
+        length = len(self._body.encode() if isinstance(self._body, str) else self._body)
+        if length:
+            self.addHeader(
+                "Content-Length",
+                str(
+                    length
+                ),
+            )
+        else:
+            self.delHeader("Content-Length")
 
     def _getHeaders(self) -> str:
         """
@@ -101,3 +103,12 @@ class JsonResponse(Response):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.addHeader("Content-Type", "application/json; charset=UTF-8")
+
+
+class RedirectResponse(Response):
+    """ Класс для ответа с Location"""
+
+    def __init__(self, location: str, *args, **kwargs):
+        super().__init__(HTTPStatus.TEMPORARY_REDIRECT, *args, **kwargs)
+        self.body = " "
+        self.addHeader("Location", location)
