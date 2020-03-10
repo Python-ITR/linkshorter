@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LINKSHORTER</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="jumbotron mt-3">
+        <h3>Поздравляем! Новая ссылка готова:</h3>
+        <a>http://localhost:9999/code</a>
+      </div>
+    </div>
+    <div class="container">
+      <form class="form-inline" action="/create_link" method="POST">
+        <div class="form-group">
+          <label for="link_input"
+            >Оригинальная ссылка:
+
+            <input
+              class="form-control"
+              id="link_input"
+              name="url"
+              placeholder="Пример: http://google.com"
+            />
+          </label>
+        </div>
+        <button class="btn btn-primary">Создать короткую версию</button>
+      </form>
+    </div>
+    <div class="container mt-4">
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>Оригинальная ссылка</th>
+            <th>Код</th>
+            <th>Кол-во просмотров</th>
+            <th>Дата создания</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for link in links %}
+          <tr>
+            <td>{{link.id}}</td>
+            <td>{{link.original_url}}</td>
+            <td>{{link.code}}</td>
+            <td>{{link.views_count}}</td>
+            <td>{{link.created_at}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

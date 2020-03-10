@@ -26,3 +26,10 @@ class HttpInternalErrorException(HttpServerException):
         if not msg:
             msg = HTTPStatus.INTERNAL_SERVER_ERROR.description
         super().__init__(msg, *args, **kwargs, status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
+class HttpBadRequestException(HttpServerException):
+    def __init__(self, msg=None, *args, **kwargs):
+        if not msg:
+            msg = HTTPStatus.BAD_REQUEST.description
+        super().__init__(msg, *args, **kwargs, status=HTTPStatus.BAD_REQUEST)

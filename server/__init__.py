@@ -2,6 +2,7 @@ from .exceptions import (
     HttpInternalErrorException,
     HttpNotFoundException,
     HttpServerException,
+    HttpBadRequestException
 )
 from .request import Request
 from .response import HtmlResponse, JsonResponse, Response, TextResponse
