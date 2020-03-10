@@ -67,7 +67,6 @@ class Response:
         Представить текущий ответ в bytes
         """
         self._updateContentLength()
-        print("!", self._getHeaders())
         http_response_bytes = bytearray(self._getHeaders(), "utf-8")  # type: bytearray
         if self._body:
             http_response_bytes.extend(b"\r\n\r\n")
